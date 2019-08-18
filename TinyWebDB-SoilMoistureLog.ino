@@ -27,9 +27,12 @@ Adafruit_BMP280 bmp; // I2C
 #include <ESP8266HTTPClient.h>
 
 #define USE_SERIAL Serial
-#define ledPin D6
-//#define ledPin BUILTIN_LED
-#define VER    "3.0.0"
+#define RED_PIN D5
+#define YELLO_PIN D6
+#define GREEN_PIN D7
+#define Sersor_Power D8
+#define ledPin LED_BUILTIN
+#define VER    "1.0.0"
 
 WiFiClient client;
 
@@ -52,6 +55,10 @@ HTTPClient http;
 void setup() {
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, HIGH);
+    pinMode(RED_PIN, OUTPUT);
+    pinMode(YELLO_PIN, OUTPUT);
+    pinMode(GREEN_PIN, OUTPUT);
+    pinMode(Sersor_Power, OUTPUT);
 
     USE_SERIAL.begin(BAUD_RATE);
    // USE_SERIAL.setDebugOutput(true);
@@ -102,6 +109,7 @@ void setup() {
 
 void loop() {
     char  tag[32];
+    int val;
 
     USE_SERIAL.printf("ESP8266 Chip id = %08X\n", ESP.getChipId());
     sprintf(tag, "weather-%06x", ESP.getChipId());
@@ -112,7 +120,25 @@ void loop() {
     sprintf(tag, "led-%06x", ESP.getChipId());
     delay(5000);
     digitalWrite(ledPin, HIGH);
+    
+    digitalWrite(Sersor_Power,HIGH);
+    delay(10);
+    val = analogRead(0);
+    Serial.println(val);
     get_TinyWebDB(tag);
+    digitalWrite(Sersor_Power,LOW);
+  
+    digitalWrite(RED_PIN,LOW);
+    digitalWrite(YELLO_PIN,LOW);
+    digitalWrite(GREEN_PIN,LOW);
+    if(val > 1000){
+      digitalWrite(RED_PIN,HIGH);
+    }else if(val > 900){
+      digitalWrite(YELLO_PIN,HIGH);
+    }else{
+      digitalWrite(GREEN_PIN,HIGH);
+    }
+  
     digitalWrite(ledPin, LOW);
     delay(5000);
 
@@ -133,7 +159,7 @@ void loop() {
 void sensor_TinyWebDB(const char* tag) {    
     int httpCode;
     char  value[256];
-    char buff[24];
+//    char buff[24];
 
     // read values from the sensor
     float pressure = bmp.readPressure() / 100;
@@ -148,7 +174,7 @@ void sensor_TinyWebDB(const char* tag) {
     root["localIP"] = WiFi.localIP().toString();
     root["temperature"] = String(temperature);
     root["pressure_hpa"] = String(pressure);
-    root["battery_Vcc"] = String(analogRead(A0) * (4.2 / 1023.0)); 
+    root["battery_Vcc"] = String(analogRead(A0)); 
 
     time_t now = time(nullptr);
     root["localTime"] = String(now);
@@ -196,7 +222,6 @@ void get_TinyWebDB(const char* tag) {
             }
         }
     } else {
-        USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         TinyWebDBWebServiceError(http.errorToString(httpCode).c_str());
     }
 
@@ -207,6 +232,8 @@ void get_TinyWebDB(const char* tag) {
 
 int TinyWebDBWebServiceError(const char* message)
 {
+    USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", message);
+    return 0;
 }
 
 // ----------------------------------------------------------------------------------------

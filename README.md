@@ -1,15 +1,13 @@
-# TinyWebDB-WeatherStation
+# TinyWebDB-SoilMoistureLog
 
-TinyWebDB-WeatherStation
+TinyWebDB-SoilMoistureLog
 ========================
 
-a Wemos D1 Mini (ESP8266) WeatherStation, store BMP280 data to TinyWebDB.
+a Wemos D1 Mini (ESP8266) SoilMoistureLog, store BMP280 data to TinyWebDB.
 
 ## Description
 
 ## Demo
-
-![result](https://github.com/edu2web/TinyWebDB-WeatherStation/blob/master/TinyWebDB-WeatherStation.jpg)
 
 ## VS. 
 
