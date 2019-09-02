@@ -112,20 +112,17 @@ void loop() {
     int val;
 
     USE_SERIAL.printf("ESP8266 Chip id = %08X\n", ESP.getChipId());
-    sprintf(tag, "weather-%06x", ESP.getChipId());
+    sprintf(tag, "Moisture-%06x", ESP.getChipId());
+
+    digitalWrite(Sersor_Power,HIGH);
+    delay(10);
+    val = analogRead(A0);
+    Serial.println(val);
+
     digitalWrite(ledPin, HIGH);
     sensor_TinyWebDB(tag);
     digitalWrite(ledPin, LOW);
-
-    sprintf(tag, "led-%06x", ESP.getChipId());
-    delay(5000);
-    digitalWrite(ledPin, HIGH);
     
-    digitalWrite(Sersor_Power,HIGH);
-    delay(10);
-    val = analogRead(0);
-    Serial.println(val);
-    get_TinyWebDB(tag);
     digitalWrite(Sersor_Power,LOW);
   
     digitalWrite(RED_PIN,LOW);
@@ -139,6 +136,11 @@ void loop() {
       digitalWrite(GREEN_PIN,HIGH);
     }
   
+    sprintf(tag, "led-%06x", ESP.getChipId());
+    delay(5000);
+    
+    digitalWrite(ledPin, HIGH);
+    get_TinyWebDB(tag);
     digitalWrite(ledPin, LOW);
     delay(5000);
 
